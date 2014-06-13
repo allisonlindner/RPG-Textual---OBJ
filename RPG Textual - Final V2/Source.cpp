@@ -136,7 +136,7 @@ int main()
 			}
 			if (showText)
 			{
-				writeText(" . . . ao lado de um coxo, eis que o Bode acorda.\n \nComeca a olhar em volta e repara\nque sua familia nao esta ali . . .\n \n \nEntao comeca a procurar . . .\n \nPress <Enter> to clean.", 10, 10);
+				writeText(" . . . ao lado de um coxo, eis que o Bode acorda.\n \nComeca a olhar em volta e repara\nque sua familia nao esta ali . . .\n \n \nEntao comeca a procurar . . .", 10, 10);
 				showText = false;
 				textUp = true;
 			}
@@ -752,7 +752,7 @@ void writeText(char text[255], int x, int y)
 		col++;
 	}
 
-	line += 3;
+	line += 5;
 	colMax += 3;
 
 	for (int i = 0; i <= line; i++)
@@ -813,6 +813,11 @@ void writeText(char text[255], int x, int y)
 
 		j++;
 	}
+
+	Console::SetCursorPosition(xBox+2, yBox-2);
+	Console::ForegroundColor = ConsoleColor::DarkCyan;
+	printf("Press <Enter> to clean.");
+	Console::ForegroundColor = ConsoleColor::White;
 }
 
 /*
