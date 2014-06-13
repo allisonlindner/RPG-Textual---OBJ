@@ -12,23 +12,33 @@ struct fase{
 	char title[100];
 	int SCREEN[HEIGHT][WIDTH];
 	int BODE[8][WIDTH];
+	bool status;
 };
 
 int pos_x = 3;
 int pos_y = HEIGHT;
 int tela = 0;
 
+int npc_x = 90;
+int npc_y = 44;
+
 bool showText = false;
+bool showNPC = false;
 //------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------
-void drawBode(int direction, int position, int x, int y);
+void drawBode(int direction, int position, int x, int y, ConsoleColor clBode);
 void drawScreen(int SCREEN[HEIGHT][WIDTH]);
 void drawScreenBode(int BODE[8][WIDTH]);
+void drawScreenCoxo(int SCREEN[HEIGHT][WIDTH]);
 void nullScreenGame(int screen[HEIGHT][WIDTH]);
 void nullScreenBode(int screen[5][WIDTH]);
 void loadFase1();
 void loadFase2();
+void loadFase3();
+void loadFase4();
+void loadFase5();
+void drawCoxo(int tela, int x, int y);
 void loadFase(int n);
 void drawCloud(int x, int y, int d);
 void jumpBode(int direction, int position);
@@ -55,6 +65,10 @@ int main()
 	bool redrawTela = true;
 	bool redrawFundoBode = false;
 	bool textUp = false;
+	bool bodeAnda = false;
+
+	for (int i = 0; i < 10; i++)
+		Fases[i].status = false;
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -122,6 +136,8 @@ int main()
 			if (redrawTela)
 			{
 				drawScreen(Fases[tela - 1].SCREEN);
+				drawBode(1, 0, 90, 30, ConsoleColor::Gray);
+				drawBode(0, 0, 50, 25, ConsoleColor::Yellow);
 				redrawTela = false;
 			}
 			if (redrawFundoBode)
@@ -131,7 +147,7 @@ int main()
 			}
 			if (redrawBode)
 			{
-				drawBode(direction, position, pos_x, pos_y);
+				drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 				redrawBode = false;
 			}
 			if (showText)
@@ -150,14 +166,128 @@ int main()
 			if (redrawFundoBode)
 			{
 				drawScreenBode(Fases[tela - 1].BODE);
+				if (showNPC && !(Fases[tela - 1].status))
+					drawBode(1, 0, npc_x, npc_y, ConsoleColor::White);
+				redrawFundoBode = false;
+			}
+			if (redrawBode)
+			{ 
+				if (showNPC && !(Fases[tela - 1].status))
+					drawBode(1, 0, npc_x, npc_y, ConsoleColor::White);
+	
+				drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
+				redrawBode = false;
+			}
+			if (!Fases[tela - 1].status)
+			{
+				if (showText)
+				{
+					writeText("O Bode: Mee!\n \nBodezinho: Mee! Mee!\n \nO Bode: Mee! Mee! Mee! Mee! Meee?            \n \nBodezinho: Meeeeee!\n \nBodezinho: Mee!", 70, 10);
+					showText = false;
+					textUp = true;
+				}
+				if (bodeAnda)
+				{
+					while (npc_x <= width - 9)
+					{
+						Thread::Sleep(50);
+						drawBode(0, 0, npc_x, npc_y, ConsoleColor::White);
+						npc_x++;
+					}
+					drawScreenBode(Fases[tela - 1].BODE);
+					drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
+					bodeAnda = false;
+					showNPC = false;
+					Fases[tela - 1].status = true;
+				}
+			}
+			break;
+		case 3:
+			if (redrawTela)
+			{
+				drawScreen(Fases[tela - 1].SCREEN);
+				redrawTela = false;
+			}
+			if (redrawFundoBode)
+			{
+				if (showNPC && !(Fases[tela - 1].status))
+				{
+					drawBode(1, 0, npc_x, npc_y, ConsoleColor::White);
+					drawBode(0, 0, npc_x - 7, npc_y + 2, ConsoleColor::Yellow);
+				}
+				drawScreenBode(Fases[tela - 1].BODE);
 				redrawFundoBode = false;
 			}
 			if (redrawBode)
 			{
-				drawBode(direction, position, pos_x, pos_y);
+				if (showNPC && !(Fases[tela - 1].status))
+				{
+					drawBode(1, 0, npc_x, npc_y, ConsoleColor::White);
+					drawBode(0, 0, npc_x - 7, npc_y + 1, ConsoleColor::Yellow);
+				}
+				drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 				redrawBode = false;
 			}
+			if (!Fases[tela - 1].status)
+			{
+				if (showText)
+				{
+					writeText(" Outro Bode: Ouvi falar que voce esta procurando sua mae?!\n \n Outro Bode: Ela passou aqui mais cedo pedindo agua e comida,\ncontinua andando pra direita que voce deve alcanca-la", 55, 10);
+					showText = false;
+					textUp = true;
+				}
+			}
 			break;
+		case 4:
+			if (redrawTela)
+			{
+				drawScreen(Fases[tela - 1].SCREEN);
+				redrawTela = false;
+			}
+			if (redrawFundoBode)
+			{
+				drawScreenBode(Fases[tela - 1].BODE);
+				redrawFundoBode = false;
+			}
+			if (redrawBode)
+			{
+				drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
+				redrawBode = false;
+			}
+		case 5:
+			if (redrawTela)
+			{
+				drawScreen(Fases[tela - 1].SCREEN);
+				redrawTela = false;
+			}
+			if (redrawFundoBode)
+			{
+				drawScreenBode(Fases[tela - 1].BODE);
+				redrawFundoBode = false;
+			}
+			if (redrawBode)
+			{
+
+				if (showNPC && !(Fases[tela - 1].status))
+				{
+					int w = 0;
+					while (w <= 8)
+					{
+						drawBode(1, 0, 79 - w, 37, ConsoleColor::Magenta);
+						drawScreenCoxo(Fases[tela - 1].SCREEN);
+						Thread::Sleep(100);
+						w++;
+					}
+					showNPC = false;
+					Fases[tela - 1].status = true;
+				}
+				if (!showNPC && Fases[tela - 1].status)
+				{
+					drawBode(1, 0, 71, 37, ConsoleColor::Magenta);
+				}
+				drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
+				redrawBode = false;
+			}
 		case 100:
 			if (redrawTela)
 			{
@@ -203,7 +333,7 @@ int main()
 				if (tela == 0)
 				{
 					tela = 1;
-					loadFase1();
+					loadFase(tela);
 					if (pos_x <= 20)
 						showText = true;
 					Console::Clear();
@@ -221,6 +351,36 @@ int main()
 						redrawBode = true;
 					}
 					else if (pos_x <= 20)
+					{
+						showText = true;
+					}
+				}
+				else if (tela == 2)
+				{
+					if (textUp)
+					{
+						textUp = false;
+						redrawFundoBode = true;
+						redrawTela = true;
+						redrawBode = true;
+						bodeAnda = true;
+					}
+					else if (pos_x >= 78)
+					{
+						showText = true;
+					}
+				}
+				else if (tela == 3)
+				{
+					if (textUp)
+					{
+						textUp = false;
+						redrawFundoBode = true;
+						redrawTela = true;
+						redrawBode = true;
+						bodeAnda = true;
+					}
+					else if (pos_x >= 75)
 					{
 						showText = true;
 					}
@@ -300,6 +460,12 @@ int main()
 						redrawFundoBode = true;
 						redrawTela = true;
 						redrawBode = true;
+
+						if (textUp)
+							textUp = false;
+
+						if (showText)
+							showText = false;
 					}
 				}
 			}
@@ -310,6 +476,22 @@ int main()
 					direction = 0;
 					pos_x++;
 					redrawBode = true;
+
+					if (pos_x == 78 && tela == 2 && showNPC)
+					{
+						showText = true;
+					}
+
+					if (pos_x == 75 && tela == 3 && showNPC)
+					{
+						showText = true;
+					}
+
+					if (pos_x == 50 && tela == 5 && !showNPC)
+					{
+						showNPC = true;
+					}
+
 				}
 				if (pos_x >= width - 9)
 				{
@@ -321,6 +503,12 @@ int main()
 					redrawFundoBode = true;
 					redrawTela = true;
 					redrawBode = true;
+
+					if (textUp)
+						textUp = false;
+
+					if (showText)
+						showText = false;
 				}
 			}
 			else if (cki.Key == ConsoleKey::UpArrow)
@@ -342,35 +530,29 @@ int main()
 	return 0;
 }
 
-void drawBode(int direction, int position, int x, int y)
+void drawBode(int direction, int position, int x, int y, ConsoleColor clBode)
 {
+	Console::SetCursorPosition(1, 1);
+	printf("Pos X: %3d", pos_x);
 	Console::BackgroundColor = bgBode;
-	Console::ForegroundColor = ConsoleColor::White;
-	//SetConsoleTextAttribute(h, 8);
+	Console::ForegroundColor = clBode;
+	
 	if (direction == 0) //Direita
 	{
 		if (position == 0) //Normal
 		{
 			Console::SetCursorPosition(x - 1, y);
 
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("     %c", 192);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c", 220);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("%c \n", 217);
 
 			y++;
 
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			Console::SetCursorPosition(x, y);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf(" %c", 218);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c%c%c", 219, 219, 219);
-			//SetConsoleTextAttribute(h, 9 | bgbode);
 			printf("| \n");
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			y++;
 
 			Console::SetCursorPosition(x + 1, y);
@@ -379,30 +561,21 @@ void drawBode(int direction, int position, int x, int y)
 		else if (position == 1) //Agaixado
 		{
 			Console::SetCursorPosition(x - 1, y);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("         \n");
 			y++;
 
 			Console::SetCursorPosition(x - 1, y);
 
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("     %c", 192);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c", 220);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("%c \n", 217);
 
 			y++;
 
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			Console::SetCursorPosition(x, y);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf(" %c", 218);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c%c%c", 219, 219, 219);
-			//SetConsoleTextAttribute(h, 9 | bgbode);
 			printf("| ");
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 		}
 	}
 	else if (direction == 1) //Esquerda
@@ -411,24 +584,16 @@ void drawBode(int direction, int position, int x, int y)
 		{
 			Console::SetCursorPosition(x - 1, y);
 
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf(" %c", 192);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c", 220);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("%c     \n", 217);
 
 			y++;
 
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			Console::SetCursorPosition(x , y);
-			//SetConsoleTextAttribute(h, 9 | bgbode);
 			printf(" |");
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c%c%c", 219, 219, 219);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("%c \n", 191);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			y++;
 
 			Console::SetCursorPosition(x + 1, y);
@@ -437,28 +602,20 @@ void drawBode(int direction, int position, int x, int y)
 		else if (position == 1) //Agaixado
 		{
 			Console::SetCursorPosition(x - 1, y);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("         \n");
 			y++;
 
 			Console::SetCursorPosition(x - 1, y);
 
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf(" %c", 192);
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c", 220);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("%c     \n", 217);
 
 			y++;
 
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			Console::SetCursorPosition(x , y);
-			//SetConsoleTextAttribute(h, 9 | bgbode);
 			printf(" |");
-			//SetConsoleTextAttribute(h, 7 | bgbode);
 			printf("%c%c%c", 219, 219, 219);
-			//SetConsoleTextAttribute(h, 8 | bgbode);
 			printf("%c ", 191);
 		}
 	}
@@ -546,6 +703,20 @@ void drawScreen(int SCREEN[HEIGHT][WIDTH])
 				Console::BackgroundColor = ConsoleColor::DarkGreen;
 				printf("%c", 219);
 			}
+			else if (SCREEN[i][j] == 14)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::DarkCyan;
+				Console::BackgroundColor = ConsoleColor::DarkGreen;
+				printf("%c", 219);
+			}
+			else if (SCREEN[i][j] == 15)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::DarkBlue;
+				Console::BackgroundColor = ConsoleColor::DarkGreen;
+				printf("%c", 219);
+			}
 		}
 	}
 }
@@ -564,9 +735,63 @@ void drawScreenBode(int BODE[8][WIDTH])
 				Console::SetCursorPosition(j,(HEIGHT - 8) + i);
 				printf(" ");
 			}
+			else if (BODE[i][j] == 1)
+			{
+				Console::SetCursorPosition(j, (HEIGHT - 8) + i);
+				Console::ForegroundColor = ConsoleColor::DarkYellow;
+				printf("%c", 219);
+			}
 		}
 	}
 	Console::BackgroundColor = ConsoleColor::Black;
+}
+
+void drawScreenCoxo(int SCREEN[HEIGHT][WIDTH])
+{
+	Console::BackgroundColor = ConsoleColor::Black;
+	Console::ForegroundColor = ConsoleColor::White;
+	
+	Console::SetCursorPosition(0, 0);
+
+	for (int i = 0; i < HEIGHT - 5; i++)
+	{
+		for (int j = 0; j < WIDTH; j++)
+		{
+			if (SCREEN[i][j] == 7)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::Gray;
+				printf("%c", 219);
+			}
+			else if (SCREEN[i][j] == 8)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::Gray;
+				Console::BackgroundColor = ConsoleColor::DarkGreen;
+				printf("%c", 220);
+			}
+			else if (SCREEN[i][j] == 9)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::Gray;
+				Console::BackgroundColor = ConsoleColor::DarkGray;
+				printf("%c", 223);
+			}
+			else if (SCREEN[i][j] == 10)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::Cyan;
+				printf("%c", 219);
+			}
+			else if (SCREEN[i][j] == 11)
+			{
+				Console::SetCursorPosition(j, i);
+				Console::ForegroundColor = ConsoleColor::Black;
+				Console::BackgroundColor = ConsoleColor::DarkGreen;
+				printf("%c", 193);
+			}
+		}
+	}
 }
 
 void nullScreenGame(int screen[HEIGHT][WIDTH])
@@ -597,26 +822,26 @@ void jumpBode(int direction, int position)
 	pos_x = pos_x + (1 * (pow(-1.0, direction)));
 	Thread::Sleep(100);
 	drawScreenBode(Fases[tela - 1].BODE);
-	drawBode(direction, position, pos_x, pos_y);
+	drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 	pos_y--;
 	pos_x = pos_x + (1 * (pow(-1.0, direction)));
 	Thread::Sleep(100);
 	drawScreenBode(Fases[tela - 1].BODE);
-	drawBode(direction, position, pos_x, pos_y);
+	drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 	pos_x = pos_x + (1 * (pow(-1.0, direction)));
 	Thread::Sleep(100);
 	drawScreenBode(Fases[tela - 1].BODE);
-	drawBode(direction, position, pos_x, pos_y);
+	drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 	pos_y++;
 	pos_x = pos_x + (1 * (pow(-1.0, direction)));
 	Thread::Sleep(100);
 	drawScreenBode(Fases[tela - 1].BODE);
-	drawBode(direction, position, pos_x, pos_y);
+	drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 	pos_y++;
 	pos_x = pos_x + (1 * (pow(-1.0, direction)));
 	Thread::Sleep(100);
 	drawScreenBode(Fases[tela - 1].BODE);
-	drawBode(direction, position, pos_x, pos_y);
+	drawBode(direction, position, pos_x, pos_y, ConsoleColor::White);
 }
 
 //----------DESENHANDO AS FASES------------------------------------------
@@ -641,21 +866,7 @@ void loadFase1()
 		for (int i = 0; i < WIDTH; i++)
 			Fases[0].SCREEN[j][i] = 4;
 
-	Fases[0].SCREEN[38][9] = 7;
-	
-	for (int j = 0; j <= 11; j++)
-		Fases[0].SCREEN[39][9 + j] = 9;
-
-	for (int j = 1; j <= 10; j++)
-		Fases[0].SCREEN[38][9 + j] = 10;
-	
-	for (int j = 0; j <= 11; j++)
-		Fases[0].SCREEN[37][9+j] = 8;
-
-	Fases[0].SCREEN[38][20] = 7;
-
-	Fases[0].SCREEN[40][10] = 11;
-	Fases[0].SCREEN[40][19] = 11;
+	drawCoxo(0, 38, 9);
 	
 	for(int i = 0; i < 8; i++)
 		Fases[0].SCREEN[39 - i][26] = 12;
@@ -683,11 +894,16 @@ void loadFase1()
 	
 	for(int i = 0; i < 4; i++)
 		Fases[0].SCREEN[25][25 + i] = 13;
+
+	bgBode = ConsoleColor::DarkGreen;
 }
 
 void loadFase2()
 {
 	pos_y = pos_y - 6;
+	npc_x = 90;
+	npc_y = 44;
+	
 	for (int j = 0; j < 7; j++)
 		for (int i = 0; i < WIDTH; i++)
 			Fases[1].SCREEN[j][i] = 5;
@@ -704,14 +920,191 @@ void loadFase2()
 	for (int j = 7; j < HEIGHT; j++)
 		for (int i = 0; i < WIDTH; i++)
 			Fases[1].SCREEN[j][i] = 4;
+
+	showNPC = true;
+	bgBode = ConsoleColor::DarkGreen;
+}
+
+void loadFase3()
+{
+	pos_y = pos_y - 6;
+	npc_x = 90;
+	npc_y = 43;
+
+	for (int j = 0; j < HEIGHT; j++)
+		for (int i = 0; i < WIDTH; i++)
+		{
+			Fases[2].SCREEN[j][i] = 5;
+			if (j >= 0 && j <= 6)
+				Fases[2].SCREEN[j][i] = 10;
+			if (j == 8 || j == 11 || j == 16)
+				Fases[2].SCREEN[j][i] = 15;
+		}
+
+	drawCloud(2, 1, 8);
+	drawCloud(40, 3, 12);
+	drawCloud(55, 2, 6);
+	showNPC = true;
+	bgBode = ConsoleColor::DarkYellow;
+}
+
+void loadFase4()
+{
+	pos_y = pos_y - 6;
+
+	for (int j = 0; j < HEIGHT; j++)
+		for (int i = 0; i < WIDTH; i++)
+		{
+		Fases[3].SCREEN[j][i] = 5;
+		if (j >= 0 && j <= 6)
+			Fases[2].SCREEN[j][i] = 10;
+		if (j == 8 || j == 11 || j == 16)
+			Fases[3].SCREEN[j][i] = 15;
+		}
+
+	drawCloud(2, 1, 8);
+	drawCloud(40, 3, 12);
+	drawCloud(55, 2, 6);
+	showNPC = true;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][4+i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][13 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][22 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][31 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][40 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][49 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][58 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][67 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][76 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][85 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][94 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][103 + i] = 1;
+
+	for (int i = 0; i < 7; i++)
+		Fases[3].BODE[5][112 + i] = 1;
+	bgBode = ConsoleColor::Blue;
+}
+
+void loadFase5()
+{
+	pos_y = pos_y - 6;
+	for (int j = 0; j < 7; j++)
+		for (int i = 0; i < WIDTH; i++)
+			Fases[4].SCREEN[j][i] = 5;
+
+	//Nuvem 01
+	drawCloud(2, 1, 8);
+
+	//Nuvem 02
+	drawCloud(15, 3, 12);
+
+	//Nuvem 03
+	drawCloud(30, 2, 6);
+
+	for (int j = 7; j < HEIGHT; j++)
+		for (int i = 0; i < WIDTH; i++)
+			Fases[4].SCREEN[j][i] = 4;
+
+	drawCoxo(4, 38, 79);
+
+	Fases[4].SCREEN[40][80] = 11;
+	Fases[4].SCREEN[40][89] = 11;
+
+	for (int i = 0; i < 8; i++)
+		Fases[4].SCREEN[39 - i][96] = 12;
+
+	for (int i = 0; i < 8; i++)
+		Fases[4].SCREEN[39 - i][97] = 12;
+
+	for (int i = 0; i < 4; i++)
+		Fases[4].SCREEN[31][95 + i] = 13;
+
+	for (int i = 0; i < 8; i++)
+		Fases[4].SCREEN[30][93 + i] = 13;
+
+	for (int i = 0; i < 12; i++)
+		Fases[4].SCREEN[29][91 + i] = 13;
+
+	for (int i = 0; i < 14; i++)
+		Fases[4].SCREEN[28][90 + i] = 13;
+
+	for (int i = 0; i < 10; i++)
+		Fases[4].SCREEN[27][92 + i] = 13;
+
+	for (int i = 0; i < 6; i++)
+		Fases[4].SCREEN[26][94 + i] = 13;
+
+	for (int i = 0; i < 4; i++)
+		Fases[4].SCREEN[25][95 + i] = 13;
+
+	bgBode = ConsoleColor::DarkGreen;
+	showNPC = false;
+}
+
+void drawCoxo(int n, int x, int y)
+{
+	Fases[n].SCREEN[x][y] = 7;
+
+	for (int j = 0; j <= 11; j++)
+		Fases[n].SCREEN[x+1][y + j] = 9;
+
+	for (int j = 1; j <= 10; j++)
+		Fases[n].SCREEN[x][y + j] = 10;
+
+	for (int j = 0; j <= 11; j++)
+		Fases[n].SCREEN[x-1][y + j] = 8;
+
+	Fases[n].SCREEN[x][y+11] = 7;
+
+	Fases[n].SCREEN[x+2][y+1] = 11;
+	Fases[n].SCREEN[x+2][y+10] = 11;
 }
 
 void loadFase(int n)
 {
 	if (n == 1)
+	{
 		loadFase1();
+	}
 	else if (n == 2)
+	{
 		loadFase2();
+	}
+	else if (n == 3)
+	{
+		loadFase3();
+	}
+	else if (n == 4)
+	{
+		loadFase4();
+	}
+	else if (n == 5)
+	{
+		loadFase5();
+	}
 }
 
 void drawCloud(int x, int y, int d)
@@ -816,7 +1209,7 @@ void writeText(char text[255], int x, int y)
 
 	Console::SetCursorPosition(xBox+2, yBox-2);
 	Console::ForegroundColor = ConsoleColor::DarkCyan;
-	printf("Press <Enter> to clean.");
+	printf("Press <Enter> to continue.");
 	Console::ForegroundColor = ConsoleColor::White;
 }
 
@@ -831,5 +1224,7 @@ void writeText(char text[255], int x, int y)
 11 = Pé Coxo = 293
 12 = Tronco das Arveres
 13 = Folha das Arveres
+14 = Mar 1
+15 = Mar 2
 */
 //----------DESENHANDO AS FASES------------------------------------------
